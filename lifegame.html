@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Jogo Da Vida</title>
+        <link rel="stylesheet" href=".\style.css">
+    </head>
+    <body>
+        <div id="grid"></div>
+    </body>
+    <script>
+        //Estabelece a quantidade de células por lado da grid
+        const squareHeight = 100;
+        //Passa o valor da quantidade de células do lado da grid para uma propriedade css
+        document.documentElement.style.setProperty('--tamanho-grid', squareHeight);
+
+        //Essa função calcula a quantidade de visinhos vivos de uma célula
+        function getLivingNeighbors(cellRow, cellCol) {
+            //Incrementos de posição para acessar as células vizinhas
+            let pos = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, -1], [-1, 1], [1, 1], [-1, -1]];
+            let counter = 0;
+
+            pos.forEach(pair => {
+                let x = pair[0];
+                let y = pair[1];
+                
+                //Garante que os incrementos não passarão dos limites do grid    
+                if (cellRow == 1 && x < 0) x = 0;
+                if (cellRow == squareHeight && x > 0) x = 0;
+                if (cellCol == 1 && y < 0) y = 0;
+                if (cellCol == squareHeight && y > 0) y = 0;
+                
+                //Garante que a prox posição não é igual à posição da célula de referência
+                if (!((cellRow + x == cellRow) && (cellCol + y == cellCol))) {
+                    let neighborCell = document.getElementById(`${cellRow + x}-${cellCol + y}`);
+                    
+                    if (getComputedStyle(neighborCell).backgroundColor == "rgb(0, 0, 0)") {
+                        counter++;
+                    }
+                }
+            });
+            
+            return counter;
+        }
+
+        /*Essa função é responsável por aplicar as regras do jogo da vida em looping,
+        */
+        function loop() {
+                let cellsToDie = [];
+                let cellsToBeBorn = [];
+
+                //Verifica qual céllula nasce ou morre em cada geração
+                for(let row = 1; row<=squareHeight; row++) {
+                    for(let col = 1; col<=squareHeight; col++) {
+                        
+                        let cell = document.getElementById(`${row}-${col}`);
+                        let cellIsAlive = getComputedStyle(cell).backgroundColor == "rgb(0, 0, 0)";
+                        let totalNeighborsAlive = getLivingNeighbors(row, col);
+
+                        if(cellIsAlive && totalNeighborsAlive < 2) {
+                            cellsToDie.push(cell);
+                        } else if(cellIsAlive && totalNeighborsAlive <= 3) {
+                            //
+                        } else if(cellIsAlive && totalNeighborsAlive > 3) {
+                            cellsToDie.push(cell);
+                        } else if(!cellIsAlive && totalNeighborsAlive == 3) {
+                            cellsToBeBorn.push(cell);
+                        }
+                    }
+                }
+
+                //Atualiza a grid de células para as células que devem morrer
+                cellsToDie.forEach(cell => {
+                    cell.style.backgroundColor = "rgb(255, 255, 255)";
+                });
+                //Atualiza a grid de células para as células que devem nascer
+                cellsToBeBorn.forEach(cell => {
+                    cell.style.backgroundColor = "rgb(0, 0, 0)";
+                })
+            
+            //Reinicia o loop
+            requestAnimationFrame(loop);
+        }
+
+        //Esta função cria a grid e sorteia células para estarem vivas no início
+        function startGrid() {
+            let gridElement = document.getElementById("grid")
+            let grid = document.getElementById("grid");
+
+            let gridHTML = "";
+            for(let row = 1; row<=squareHeight; row++) {
+                gridHTML += "<div class='row'>"
+                for(let col = 1; col<=squareHeight; col++) {
+                    if(Math.random() <= 0.5) {
+                        gridHTML += `<canvas id="${row}-${col}" style="background-color: black"></canvas>`;
+                    } else {
+                        gridHTML += `<canvas id="${row}-${col}"></canvas>`;
+                    }
+                }
+            gridHTML += "</div>"
+            }
+
+            grid.innerHTML = gridHTML;
+        }
+
+        //Inicia a grid
+        startGrid();
+        //Inicia o loop
+        requestAnimationFrame(loop);
+    </script>
+</html>

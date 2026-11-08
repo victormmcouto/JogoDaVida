@@ -1,0 +1,39 @@
+:root {
+    --tamanho-grid: 100;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(1, 100vmin);
+    grid-template-rows: repeat(var(--tamanho-grid), calc(100vmin / var(--tamanho-grid)));
+    gap: 0;
+    border: 1px solid black;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(var(--tamanho-grid), calc(100vmin / var(--tamanho-grid)));
+    grid-template-rows: repeat(1, calc(100vmin /  var(--tamanho-grid)));
+    gap: 0;
+}
+
+canvas {
+    width: calc(100vmin /  var(--tamanho-grid));
+    height: calc(100vmin /  var(--tamanho-grid));
+    border: 1px solid rgba(255, 255, 255, 0.723);
+}
